@@ -1,22 +1,12 @@
-import base58
-from solana.rpc.api import Client
-from solders.pubkey import Pubkey
-from solders.signature import Signature
-import re
-from dotenv import load_dotenv
-import os
-
-SOLANA_KEY = os.getenv('SOLANA_KEY')
-wallet_address = 'Gxvi21TQFxfSYQnonZadATrpDvCx9tNjpxpzV2EN5Ays'
-decoded_bytes = base58.b58decode(wallet_address)
-solana_client = Client(SOLANA_KEY)
-
-print(len(decoded_bytes)) #32 bytes
-
-address = Pubkey(decoded_bytes)
-transaction_history = solana_client.get_signatures_for_address(address, limit=1)
-transaction_history = str(transaction_history)
-signatures = re.findall(r'signature: "([A-Za-z0-9]+)"', transaction_history)
-sig = Signature.from_string(signatures[0])
-print(signatures)
-print(sig)
+from jsonrpcclient import request, parse, Ok
+import logging
+import requests
+response = requests.post("https://long-patient-thunder.solana-mainnet.quiknode.pro/489b5d8fac89460c8e91f249eac9ee2b6a83e1e2/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+parsed = parse(response.json())
+if isinstance(parsed, Ok):
+    token_supply = int(parsed.result['value']['amount'])
+    decimals = int(parsed.result['value']['decimals'])
+    human_readable_supply = token_supply / (10 ** decimals)
+    print(f"Human Readable Token Supply: {human_readable_supply}")
+else:
+    logging.error(parsed.message)

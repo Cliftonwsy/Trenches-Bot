@@ -63,3 +63,37 @@ for x in range(n):
                     elif "account_index: 2" not in str(info):
                         continue
                 print("done")
+"""
+get token supply
+
+from jsonrpcclient import request, parse, Ok
+import logging
+import requests
+response = requests.post("https://docs-demo.solana-mainnet.quiknode.pro/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+parsed = parse(response.json())
+if isinstance(parsed, Ok):
+    print(parsed.result)
+else:
+    logging.error(parsed.message)
+"""
+
+"""
+get price
+
+import requests
+
+# Your Jupiter API URL (replace with your actual URL)
+url = "https://api.jup.ag/price/v2?ids=6cnDfXAG9EsGn5BB1QF3i6Xx1SNJ88Qcc1nckJp6pump"
+
+# Make a GET request to the price endpoint
+response = requests.get(url, params={
+    'token': 'USDC'  # Example token
+})
+
+# Parse and display the response
+if response.status_code == 200:
+    data = response.json()
+    print("Token Price:", data)
+else:
+    print("Error:", response.status_code)
+"""

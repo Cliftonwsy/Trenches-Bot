@@ -8,15 +8,18 @@ from solana.rpc.api import Client
 from solders.pubkey import Pubkey
 from solders.signature import Signature
 from solana.exceptions import SolanaRpcException
+import requests
+import logging
+from jsonrpcclient import request, parse, Ok
 
+load_dotenv()
 SOLANA_KEY = os.getenv('SOLANA_KEY')
 TELEBOT_API_KEY = os.getenv('TELEBOT_API_KEY')
 bot = telebot.TeleBot(TELEBOT_API_KEY)
 
 wallet_address = [
-    'Gxvi21TQFxfSYQnonZadATrpDvCx9tNjpxpzV2EN5Ays',
-    '831qmkeGhfL8YpcXuhrug6nHj1YdK3aXMDQUCo85Auh1',
-    '5cgJxGHwtrPVx7Uwv84EPb5PnsK1dbDQ8q193sCDrhff',
+    '6xuMV6W6QVxrVmsZxEdLfV6kfhuBsg3ah1X8rydLfQvy',
+    'Hd9HKLie1nKXx4zLQXg9WVYyK95kBFEC7bj1aGwRtBqF',
 ]
 repeated_lists = {wallet: ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1'] for wallet in wallet_address}
 first_tx_list = ['1', '1', '1']
@@ -61,16 +64,39 @@ def start(message):
                             if "account_index: 2" in str(info) and identified_list[i][x] not in repeated_lists[wallet_address[i]]:
                                 pattern = r'account_index: 2, mint: "([^"]+)"'
                                 match = re.search(pattern, str(info))
+                                url = f"https://api.jup.ag/price/v2?ids={match.group(1)}"
+                                response = requests.get(url, params={'token': 'USDC'})
+                                if response.status_code == 200:
+                                    data = response.json()
+                                    if 'data' in data and match.group(1) in data['data']:
+                                        price = data['data'][match.group(1)]['price']
+                                        response = requests.post("https://long-patient-thunder.solana-mainnet.quiknode.pro/489b5d8fac89460c8e91f249eac9ee2b6a83e1e2/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+                                        parsed = parse(response.json())
+                                        if isinstance(parsed, Ok):
+                                            token_supply = int(parsed.result['value']['amount'])
+                                            decimals = int(parsed.result['value']['decimals'])
+                                            human_readable_supply = token_supply / (10 ** decimals)
+                                            human_readable_supply = float(human_readable_supply)
+                                            price = float(price)
+                                            market_cap = human_readable_supply * price
+                                        else:
+                                            logging.error(parsed.message)
+                                    else:
+                                        print(f"Error: Token {match.group(1)} not found in the response.")
+                                else:
+                                    print("Error:", response.status_code)
                                 if match.group(1) == "So11111111111111111111111111111111111111112":
                                     continue
                                 else:
+                                    escaped_market_cap = str(market_cap).replace('.', '\\.')
                                     bot.send_message(message.chat.id, 
                                                      f"💰 *MEMECOIN BUY ALERT* 💰\n\n"
                                                      f"💳 *WALLET NAME:* 💳\nWALLET {int(i) + 1}\n\n"
                                                      f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n"
                                                      f"🔒 RAYDIUM V4 🔒\n\n"
-                                                     f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}"
-                                                     ,parse_mode='MarkdownV2')
+                                                     f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}\n\n"
+                                                     f"💲 *MARKET CAP:* 💲\nUSD {escaped_market_cap}",
+                                                     parse_mode='MarkdownV2')
                                     repeated_lists[wallet_address[i]][x] = identified_list[i][x]
                             elif "account_index: 2" not in str(info):
                                 continue
@@ -85,16 +111,39 @@ def start(message):
                             if "account_index: 6" in str(info) and identified_list[i][x] not in repeated_lists[wallet_address[i]]:
                                 pattern = r'account_index: 6, mint: "([^"]+)"'
                                 match = re.search(pattern, str(info))
+                                url = f"https://api.jup.ag/price/v2?ids={match.group(1)}"
+                                response = requests.get(url, params={'token': 'USDC'})
+                                if response.status_code == 200:
+                                    data = response.json()
+                                    if 'data' in data and match.group(1) in data['data']:
+                                        price = data['data'][match.group(1)]['price']
+                                        response = requests.post("https://long-patient-thunder.solana-mainnet.quiknode.pro/489b5d8fac89460c8e91f249eac9ee2b6a83e1e2/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+                                        parsed = parse(response.json())
+                                        if isinstance(parsed, Ok):
+                                            token_supply = int(parsed.result['value']['amount'])
+                                            decimals = int(parsed.result['value']['decimals'])
+                                            human_readable_supply = token_supply / (10 ** decimals)
+                                            human_readable_supply = float(human_readable_supply)
+                                            price = float(price)
+                                            market_cap = human_readable_supply * price
+                                        else:
+                                            logging.error(parsed.message)
+                                    else:
+                                        print(f"Error: Token {match.group(1)} not found in the response.")
+                                else:
+                                    print("Error:", response.status_code)
                                 if match.group(1) == "So11111111111111111111111111111111111111112":
                                     continue
                                 else:
+                                    escaped_market_cap = str(market_cap).replace('.', '\\.')
                                     bot.send_message(message.chat.id, 
                                                      f"💰 *MEMECOIN BUY ALERT* 💰\n\n"
                                                      f"💳 *WALLET NAME:* 💳\nWALLET {int(i) + 1}\n\n"
                                                      f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n"
                                                      f"✊ PUMPFUN ✊\n\n"
-                                                     f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}"
-                                                     ,parse_mode='MarkdownV2')
+                                                     f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}\n\n"
+                                                     f"💲 *MARKET CAP:* 💲\nUSD {escaped_market_cap}",
+                                                     parse_mode='MarkdownV2')
                                     repeated_lists[wallet_address[i]][x] = identified_list[i][x]
                             elif "account_index: 6" not in str(info):
                                 continue
