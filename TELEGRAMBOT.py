@@ -70,7 +70,7 @@ def start(message):
                                     data = response.json()
                                     if 'data' in data and match.group(1) in data['data']:
                                         price = data['data'][match.group(1)]['price']
-                                        response = requests.post("https://long-patient-thunder.solana-mainnet.quiknode.pro/489b5d8fac89460c8e91f249eac9ee2b6a83e1e2/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+                                        response = requests.post(SOLANA_KEY, json=request("getTokenSupply", params=([match.group(1)])))
                                         parsed = parse(response.json())
                                         if isinstance(parsed, Ok):
                                             token_supply = int(parsed.result['value']['amount'])
@@ -78,6 +78,8 @@ def start(message):
                                             human_readable_supply = token_supply / (10 ** decimals)
                                             human_readable_supply = float(human_readable_supply)
                                             price = float(price)
+                                            print(human_readable_supply)
+                                            print(price)
                                             market_cap = human_readable_supply * price
                                         else:
                                             logging.error(parsed.message)
@@ -117,7 +119,7 @@ def start(message):
                                     data = response.json()
                                     if 'data' in data and match.group(1) in data['data']:
                                         price = data['data'][match.group(1)]['price']
-                                        response = requests.post("https://long-patient-thunder.solana-mainnet.quiknode.pro/489b5d8fac89460c8e91f249eac9ee2b6a83e1e2/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+                                        response = requests.post(SOLANA_KEY, json=request("getTokenSupply", params=([match.group(1)])))
                                         parsed = parse(response.json())
                                         if isinstance(parsed, Ok):
                                             token_supply = int(parsed.result['value']['amount'])

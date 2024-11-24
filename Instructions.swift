@@ -69,7 +69,7 @@ get token supply
 from jsonrpcclient import request, parse, Ok
 import logging
 import requests
-response = requests.post("https://docs-demo.solana-mainnet.quiknode.pro/", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
+response = requests.post("", json=request("getTokenSupply", params=(["7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"])))
 parsed = parse(response.json())
 if isinstance(parsed, Ok):
     print(parsed.result)
@@ -83,7 +83,7 @@ get price
 import requests
 
 # Your Jupiter API URL (replace with your actual URL)
-url = "https://api.jup.ag/price/v2?ids=6cnDfXAG9EsGn5BB1QF3i6Xx1SNJ88Qcc1nckJp6pump"
+url =
 
 # Make a GET request to the price endpoint
 response = requests.get(url, params={
