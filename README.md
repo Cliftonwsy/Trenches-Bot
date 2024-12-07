@@ -1,6 +1,10 @@
 # Trenches-Bot
 Trenches Project with Reymus
 
+V1.2   8/12/2024
+- Updated Pumpfun identification; now can fully identify Pumpfun
+- Removed transaction type (because pumpfun and raydium identification wonky but works as intended)
+
 V1.1   24/11/2024
 - Added Jupiter Swap API
     - Allows to scan token instead of being confined to blockchain info

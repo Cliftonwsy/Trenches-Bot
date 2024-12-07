@@ -18,8 +18,9 @@ TELEBOT_API_KEY = os.getenv('TELEBOT_API_KEY')
 bot = telebot.TeleBot(TELEBOT_API_KEY)
 
 wallet_address = [
-    '6xuMV6W6QVxrVmsZxEdLfV6kfhuBsg3ah1X8rydLfQvy',
-    'Hd9HKLie1nKXx4zLQXg9WVYyK95kBFEC7bj1aGwRtBqF',
+    '8dW9jXpY5DXE3sHF6VesaYnUwcvohnkZQxkP9zmrQM3d',
+    'EnCF8X4dPsnC9bDEkjG4W8eejBtYzau63UcPbaHP1m5u',
+    'GabJmv8GiNCgEgFtu831erktP3GroZTgCm7vrRzWuJMo'
 ]
 repeated_lists = {wallet: ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1'] for wallet in wallet_address}
 first_tx_list = ['1', '1', '1']
@@ -78,8 +79,6 @@ def start(message):
                                             human_readable_supply = token_supply / (10 ** decimals)
                                             human_readable_supply = float(human_readable_supply)
                                             price = float(price)
-                                            print(human_readable_supply)
-                                            print(price)
                                             market_cap = human_readable_supply * price
                                         else:
                                             logging.error(parsed.message)
@@ -94,8 +93,7 @@ def start(message):
                                     bot.send_message(message.chat.id, 
                                                      f"💰 *MEMECOIN BUY ALERT* 💰\n\n"
                                                      f"💳 *WALLET NAME:* 💳\nWALLET {int(i) + 1}\n\n"
-                                                     f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n"
-                                                     f"🔒 RAYDIUM V4 🔒\n\n"
+                                                     f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n\n"
                                                      f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}\n\n"
                                                      f"💲 *MARKET CAP:* 💲\nUSD {escaped_market_cap}",
                                                      parse_mode='MarkdownV2')
@@ -103,18 +101,21 @@ def start(message):
                             elif "account_index: 2" not in str(info):
                                 continue
                     #check for pumpfun
-                    elif "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf" in str(extracted_info):
+                    elif "CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM" in str(extracted_info):
                         identified_list[i].append(signatures[j])
                         n+=1
                         for x in range(n):
                             solana_client = Client(SOLANA_KEY)
                             sig = Signature.from_string(identified_list[i][x])
                             info = solana_client.get_transaction(sig, "jsonParsed", max_supported_transaction_version=0)
-                            if "account_index: 6" in str(info) and identified_list[i][x] not in repeated_lists[wallet_address[i]]:
-                                pattern = r'account_index: 6, mint: "([^"]+)"'
-                                match = re.search(pattern, str(info))
-                                url = f"https://api.jup.ag/price/v2?ids={match.group(1)}"
-                                response = requests.get(url, params={'token': 'USDC'})
+                            if "account_index: 5" in str(info) and identified_list[i][x] not in repeated_lists[wallet_address[i]]:
+                                pattern = r'account_index: 5, mint: "([^"]+)"'
+                                last_match = None
+                                for match in re.finditer(pattern, str(info)):
+                                    last_match = match.group(1)
+                                if last_match:
+                                    url = f"https://api.jup.ag/price/v2?ids={last_match}"
+                                    response = requests.get(url, params={'token': 'USDC'})
                                 if response.status_code == 200:
                                     data = response.json()
                                     if 'data' in data and match.group(1) in data['data']:
@@ -141,8 +142,7 @@ def start(message):
                                     bot.send_message(message.chat.id, 
                                                      f"💰 *MEMECOIN BUY ALERT* 💰\n\n"
                                                      f"💳 *WALLET NAME:* 💳\nWALLET {int(i) + 1}\n\n"
-                                                     f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n"
-                                                     f"✊ PUMPFUN ✊\n\n"
+                                                     f"🔑 *TRANSACTION:* 🔑\n{identified_list[i][x]}\n\n"
                                                      f"🚀 *TOKEN ID:* 🚀\n{match.group(1)}\n\n"
                                                      f"💲 *MARKET CAP:* 💲\nUSD {escaped_market_cap}",
                                                      parse_mode='MarkdownV2')
@@ -150,7 +150,7 @@ def start(message):
                             elif "account_index: 6" not in str(info):
                                 continue
                     #if got none
-                    elif "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1" not in str(extracted_info) or "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf" not in str(extracted_info):
+                    elif "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1" not in str(extracted_info) or "CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM" not in str(extracted_info):
                         continue
 
             except (SolanaRpcException, Exception) as e:  # Added error handling
